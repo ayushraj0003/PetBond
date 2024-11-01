@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { HeartIcon, ChatBubbleBottomCenterTextIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
+import { FloatingNav } from '@/components/ui/floating-navbar'
 
 export default function PetBondLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -46,7 +47,7 @@ export default function PetBondLanding() {
           </ul>
         </nav>
       </header>
-
+              <FloatingNav/>
       <main>
         <section className="container mx-auto px-4 py-20 text-center">
           <motion.h1
