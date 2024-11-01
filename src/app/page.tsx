@@ -1,101 +1,172 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useEffect } from 'react'
+import { motion, useAnimation } from 'framer-motion'
+import { HeartIcon, ChatBubbleBottomCenterTextIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import Image from 'next/image'
+
+export default function PetBondLanding() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const controls = useAnimation()
+
+  useEffect(() => {
+    controls.start(i => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.1 }
+    }))
+  }, [controls])
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-b from-pink-100 to-purple-200">
+      <header className="container mx-auto px-4 py-6">
+        <nav className="flex justify-between items-center">
+          <div className="text-3xl font-bold text-purple-600">PetBond</div>
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-purple-600 focus:outline-none"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
+          <ul className={`md:flex space-x-6 ${isMenuOpen ? 'block' : 'hidden'}`}>
+            <li><a href="#features" className="text-purple-600 hover:text-purple-800">Features</a></li>
+            <li><a href="#how-it-works" className="text-purple-600 hover:text-purple-800">How It Works</a></li>
+            <li><a href="#download" className="text-purple-600 hover:text-purple-800">Download</a></li>
+          </ul>
+        </nav>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      <main>
+        <section className="container mx-auto px-4 py-20 text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-5xl md:text-6xl font-bold text-purple-800 mb-6"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Find Your Pet's Perfect Match
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-xl text-purple-600 mb-10"
           >
-            Read our docs
-          </a>
-        </div>
+            Connect, play, and bond with other pets in your area
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <a
+              href="#download"
+              className="bg-purple-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-purple-700 transition duration-300"
+            >
+              Get Started
+            </a>
+          </motion.div>
+        </section>
+
+        <section id="features" className="container mx-auto px-4 py-20">
+          <h2 className="text-4xl font-bold text-purple-800 text-center mb-12">Why Choose PetBond?</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: HeartIcon, title: "Match with Compatible Pets", description: "Our algorithm finds the perfect playmates for your furry friend" },
+              { icon: ChatBubbleBottomCenterTextIcon, title: "Chat and Plan Meetups", description: "Easily communicate with other pet owners and arrange playdates" },
+              { icon: MapPinIcon, title: "Discover Pet-Friendly Locations", description: "Find the best parks, cafes, and events for you and your pet" }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={controls}
+                custom={index}
+                className="bg-white p-6 rounded-lg shadow-lg text-center"
+              >
+                <feature.icon className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-purple-800 mb-2">{feature.title}</h3>
+                <p className="text-purple-600">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        <section id="how-it-works" className="container mx-auto px-4 py-20 text-center">
+          <h2 className="text-4xl font-bold text-purple-800 mb-12">How It Works</h2>
+          <div className="flex flex-col md:flex-row justify-center items-center space-y-8 md:space-y-0 md:space-x-8">
+            {[
+              { step: 1, text: "Create a profile for your pet" },
+              { step: 2, text: "Browse and match with other pets" },
+              { step: 3, text: "Chat and arrange meetups" },
+              { step: 4, text: "Enjoy playdates and make new friends!" }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4">
+                  {item.step}
+                </div>
+                <p className="text-purple-800 font-semibold">{item.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        <section id="download" className="container mx-auto px-4 py-20 text-center">
+          <h2 className="text-4xl font-bold text-purple-800 mb-6">Ready to Find Your Pet's Soulmate?</h2>
+          <p className="text-xl text-purple-600 mb-10">Download PetBond now and start making connections!</p>
+          <div className="flex justify-center space-x-4">
+            <motion.a
+              href="#"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-black text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-800 transition duration-300 flex items-center"
+            >
+              <svg className="w-6 h-6 mr-2" viewBox="0 0 384 512">
+                <path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+              </svg>
+              Download for iOS
+            </motion.a>
+            <motion.a
+              href="#"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300 flex items-center"
+            >
+              <svg className="w-6 h-6 mr-2" viewBox="0 0 512 512">
+                <path fill="currentColor" d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+              </svg>
+              Download for Android
+            </motion.a>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="bg-purple-800 text-white py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p>&copy; 2023 PetBond. All rights reserved.</p>
+          <div className="mt-4">
+            <a href="#" className="text-white hover:text-pink-200 mx-2">Privacy Policy</a>
+            <a href="#" className="text-white hover:text-pink-200 mx-2">Terms of Service</a>
+            <a href="#" className="text-white hover:text-pink-200 mx-2">Contact Us</a>
+          </div>
+        </div>
       </footer>
     </div>
-  );
+  )
 }
