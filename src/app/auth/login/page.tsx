@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { db } from '@/firebaseConfig'
+import { collection, getDocs, query, where } from 'firebase/firestore'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -24,15 +26,32 @@ export default function Login() {
     }
 
     try {
-      // Here you would typically make an API call to your authentication endpoint
-      // For demonstration, we'll just simulate a successful login
-      console.log('Logging in with:', { email, password })
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      // Redirect to dashboard on successful login
+      // Query Firestore to find a user with the entered email
+      const usersRef = collection(db, 'users')
+      const q = query(usersRef, where('email', '==', email))
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        setError('No account found with this email')
+        return
+      }
+
+      // Assuming one user per email; get the first document in the result
+      const userDoc = querySnapshot.docs[0]
+      const userData = userDoc.data()
+
+      // Check if the password matches
+      if (userData.password !== password) {
+        setError('Invalid email or password')
+        return
+      }
+
+      // Successful login
+      console.log('Logged in successfully:', { email, userId: userDoc.id })
       router.push('/dashboard')
     } catch (err) {
-      setError('Invalid email or password')
+      console.error('Error logging in:', err)
+      setError('An error occurred. Please try again.')
     }
   }
 

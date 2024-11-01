@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
-import { auth, db } from '@/firebaseConfig'; // Import Firestore and Auth
+import { doc, setDoc } from 'firebase/firestore'; // Firestore functions
+import { db } from '@/firebaseConfig'; // Firestore config
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,20 +32,20 @@ export default function Signup() {
     }
 
     try {
-      // Create user with Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      // Generate a unique ID or use email as the document ID
+      const userId = email; // or you can generate a unique ID
 
-      // Store user data in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        email: user.email,
+      // Save user details in Firestore
+      await setDoc(doc(db, 'users', userId), {
+        email,
+        password, // Consider hashing passwords if storing them directly in Firestore for security
         createdAt: new Date().toISOString(),
       });
 
-      // Redirect to dashboard
+      // Redirect to dashboard or another page
       router.push('/dashboard');
     } catch (err) {
-      setError('Error creating account');
+      setError('Error saving user data');
       console.error(err);
     }
   };
@@ -109,4 +108,3 @@ export default function Signup() {
     </div>
   );
 }
-  

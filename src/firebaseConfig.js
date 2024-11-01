@@ -4,15 +4,17 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore"; // Import Firestore
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDYdlekvtRlMWxBb-FpB9pfi1s3sRt1MJQ",
-    authDomain: "pet-dating-5bb59.firebaseapp.com",
-    projectId: "pet-dating-5bb59",
-    storageBucket: "pet-dating-5bb59.firebasestorage.app",
-    messagingSenderId: "744428121760",
-    appId: "1:744428121760:web:5d9d72d2f05297ba2523c5"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   };
 
 
   const app = initializeApp(firebaseConfig);
   export const auth = getAuth(app);
-  export const db = getFirestore(app); // Initialize Firestore
+  const db = getFirestore(app); 
+
+export {db};
