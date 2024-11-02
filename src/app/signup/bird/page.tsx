@@ -93,6 +93,9 @@ export default function BirdSignup() {
               required
             />
           </div>
+          <div className="flex flex-col gap-2">
+            <FileUpload/>
+          </div>
           <Button type="submit" className="w-full py-3 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700">
             Sign Up
           </Button>

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { FileUpload } from '@/components/ui/file-upload';
 
 export default function DogForm() {
   const [dogName, setDogName] = useState('');
@@ -112,6 +113,9 @@ export default function DogForm() {
               className="rounded-md border border-gray-300 bg-gray-50 text-gray-800 placeholder-gray-500 focus:border-blue-600 focus:ring focus:ring-blue-100"
               required
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <FileUpload/>
           </div>
           <Button type="submit" className="w-full py-3 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700">
             Sign Up

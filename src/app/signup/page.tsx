@@ -75,6 +75,7 @@ export default function Signup() {
               className="rounded-md border border-gray-300 bg-gray-50 text-gray-800 placeholder-gray-500 focus:border-blue-600 focus:ring focus:ring-blue-100"
               required
             />
+     
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="email" className="text-lg font-semibold text-gray-900">Email</Label>
