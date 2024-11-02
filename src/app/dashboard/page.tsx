@@ -1,288 +1,162 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { motion, useAnimation, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
-import { HeartIcon, PawPrintIcon, LogOutIcon, UserIcon, SettingsIcon } from 'lucide-react'
-import { CardContainer, CardBody, CardItem } from '@/components/ui/3d-card'
-import { SidebarProvider, Sidebar, SidebarBody } from '@/components/ui/sidebar'
+import Image from 'next/image'
+import { HeartIcon } from 'lucide-react'
 
-const petData = [
-  { id: 1, name: 'Buddy', image: '/Images/dog.jpeg', color: 'Golden', breed: 'Labrador', matchScore: 95 },
-  { id: 2, name: 'Whiskers', image: '/Images/cat2.jpeg', color: 'Gray', breed: 'Persian', matchScore: 88 },
-  { id: 3, name: 'Max', image: '/Images/cat.jpeg', color: 'Orange', breed: 'Tabby', matchScore: 92 },
-  { id: 4, name: 'Luna', image: '/Images/cat3.jpeg', color: 'Black', breed: 'Siamese', matchScore: 90 },
+import { DesktopSidebar, MobileSidebar, SidebarLink, SidebarProvider } from "@/components/ui/sidebar"
+
+const userProfiles = [
+  '/Images/dog1.jpeg',
+  '/Images/dog2.jpeg',
+  '/Images/dog3.jpeg',
+  '/Images/dog4.jpeg',
+  '/Images/dog5.jpeg',
 ]
 
-const Dial = ({ isSpinning, onStop }) => {
-  const [rotation, setRotation] = useState(0)
-  const [selectedPet, setSelectedPet] = useState(null)
+export default function MatchmakingPage() {
+  const [isMatching, setIsMatching] = useState(false)
+  const [matchedProfile, setMatchedProfile] = useState(null)
+  const [matchPercentage, setMatchPercentage] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  useEffect(() => {
-    let interval
-    if (isSpinning) {
-      interval = setInterval(() => {
-        setRotation((prev) => (prev + 10) % 360)
-      }, 50)
-    } else if (selectedPet === null) {
-      const randomIndex = Math.floor(Math.random() * petData.length)
-      setSelectedPet(petData[randomIndex])
-      onStop(petData[randomIndex])
-    }
-    return () => clearInterval(interval)
-  }, [isSpinning, onStop, selectedPet])
-
-  return (
-    <div className="relative w-80 h-80">
-      <motion.div
-        className="w-full h-full rounded-full border-8 border-purple-500 shadow-lg"
-        style={{ rotate: rotation }}
-      >
-        {petData.map((pet, index) => (
-          <React.Fragment key={pet.id}>
-            <motion.img
-              src={pet.image}
-              alt={pet.name}
-              className="absolute w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
-              style={{
-                top: `${50 - 45 * Math.cos((index * Math.PI * 2) / petData.length)}%`,
-                left: `${50 + 45 * Math.sin((index * Math.PI * 2) / petData.length)}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            />
-            <div
-              className="absolute top-1/2 left-1/2 w-full h-0.5 bg-purple-300 origin-left"
-              style={{
-                transform: `rotate(${(index * 360) / petData.length}deg)`,
-              }}
-            />
-          </React.Fragment>
-        ))}
-      </motion.div>
-      <div className="absolute top-0 left-1/2 w-4 h-12 bg-black rounded-b-full shadow-md transform -translate-x-1/2 z-10">
-        <div className="w-full h-full bg-gradient-to-r from-gray-700 via-gray-900 to-gray-700 rounded-b-full" />
-      </div>
-    </div>
-  )
-}
-
-const MatchResult = ({ pet }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -20 }}
-    className="bg-white p-4 rounded-lg shadow-lg"
-  >
-    <h3 className="text-xl font-bold mb-2">{pet.name}</h3>
-    <p>Color: {pet.color}</p>
-    <p>Breed: {pet.breed}</p>
-    <p className="text-lg font-semibold mt-2">Match Score: {pet.matchScore}%</p>
-  </motion.div>
-)
-
-export default function HomePage() {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [isMatchmaking, setIsMatchmaking] = useState(false)
-  const [matchedPet, setMatchedPet] = useState(null)
-  const controls = useAnimation()
-
-  useEffect(() => {
-    setIsLoaded(true)
-    controls.start('visible')
-  }, [controls])
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.2
-      }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1
-    }
-  }
-
-  const handleMatchmaking = () => {
-    setIsMatchmaking(true)
-    setMatchedPet(null)
-    setTimeout(() => setIsMatchmaking(false), 3000)
-  }
-
-  const handleMatchmakingStop = (pet) => {
-    setMatchedPet(pet)
+  const startMatching = () => {
+    setIsMatching(true)
+    setTimeout(() => {
+      const randomProfile = userProfiles[Math.floor(Math.random() * userProfiles.length)]
+      const randomPercentage = Math.floor(Math.random() * (100 - 70 + 1) + 70)
+      setMatchedProfile(randomProfile)
+      setMatchPercentage(randomPercentage)
+      setIsMatching(false)
+    }, 3000)
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex">
-        <Sidebar className="w-1/4 bg-purple-100 p-4 flex flex-col">
-          <SidebarBody>
-            <h2 className="text-2xl font-semibold mb-4">Options</h2>
-            <div className="space-y-4">
-              <Button
-                onClick={() => alert("Profile clicked")}
-                className="flex items-center space-x-2 bg-purple-500 text-white w-full rounded-lg p-2 hover:bg-purple-600 transition"
-              >
-                <UserIcon className="w-5 h-5" />
-                <span>Profile</span>
-              </Button>
-              <Button
-                onClick={() => alert("Settings clicked")}
-                className="flex items-center space-x-2 bg-purple-500 text-white w-full rounded-lg p-2 hover:bg-purple-600 transition"
-              >
-                <SettingsIcon className="w-5 h-5" />
-                <span>Settings</span>
-              </Button>
-              <Button
-                onClick={() => alert("Logout clicked")}
-                className="flex items-center space-x-2 bg-purple-500 text-white w-full rounded-lg p-2 hover:bg-purple-600 transition"
-              >
-                <LogOutIcon className="w-5 h-5" />
-                <span>Logout</span>
-              </Button>
-            </div>
-          </SidebarBody>
-        </Sidebar>
+    <SidebarProvider open={sidebarOpen} setOpen={setSidebarOpen}>
+      <div className="flex min-h-screen bg-gradient-to-b from-pink-100 to-purple-200">
+        
+        {/* Sidebar */}
+        <DesktopSidebar className="hidden lg:flex flex-col w-64 h-full fixed left-0 top-0 bg-white shadow-lg z-10" open={sidebarOpen} setOpen={setSidebarOpen}>
+          <SidebarLink link={{ label: "Home", href: "/", icon: <HeartIcon /> }} />
+          <SidebarLink link={{ label: "Profile", href: "/profile", icon: <HeartIcon /> }} />
+          <SidebarLink link={{ label: "Settings", href: "/settings", icon: <HeartIcon /> }} />
+        </DesktopSidebar>
 
-        <div className="flex-1 bg-gradient-to-b from-pink-100 to-purple-200 flex flex-col justify-center items-center p-4">
-          <motion.div
-            className="text-center"
-            initial="hidden"
-            animate={controls}
-            variants={containerVariants}
-          >
-            <motion.div className="mb-8" variants={itemVariants}>
-              <h1 className="text-4xl md:text-6xl font-bold text-purple-800 mb-2">
-                PetBond
-              </h1>
-              <p className="text-xl md:text-2xl text-purple-600">
-                Find your pet's perfect match!
-              </p>
-            </motion.div>
+        <MobileSidebar className="lg:hidden w-64" open={sidebarOpen} setOpen={setSidebarOpen}>
+          <SidebarLink link={{ label: "Home", href: "/", icon: <HeartIcon /> }} />
+          <SidebarLink link={{ label: "Profile", href: "/profile", icon: <HeartIcon /> }} />
+          <SidebarLink link={{ label: "Settings", href: "/settings", icon: <HeartIcon /> }} />
+        </MobileSidebar>
 
-            <div className="flex justify-center items-center space-x-8">
-              <motion.div 
-                className="relative w-64 h-64 md:w-80 md:h-80" 
-                variants={itemVariants}
-                animate={isMatchmaking ? { x: -100 } : { x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <CardContainer className="rounded-full shadow-lg" containerClassName="flex items-center justify-center">
-                  <CardBody>
-                    <CardItem
-                      className="rounded-full overflow-hidden shadow-lg"
-                      translateX={0}
-                      translateY={0}
-                      translateZ={20}
-                      rotateX="15deg"
-                      rotateY="15deg"
-                      rotateZ="5deg"
-                    >
-                      <img
-                        src='/Images/dog.jpeg'
-                        alt="Your pet"
-                        width="320"
-                        height="320"
-                        className="w-full h-full object-cover"
-                      />
-                    </CardItem>
-                  </CardBody>
-                </CardContainer>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col items-center justify-center p-4 ml-64">
+          <h1 className="text-4xl font-bold text-purple-800 mb-8">PetBond Matchmaking</h1>
 
-                <motion.div
-                  className="absolute -top-4 -left-4 bg-pink-400 rounded-full p-3"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+          <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-4xl">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-8">
+              <div className="mb-4 md:mb-0">
+                <Image
+                  src='/Images/dog1.jpeg'
+                  alt="Your profile"
+                  width={200}
+                  height={200}
+                  className="rounded-full border-4 border-purple-500"
+                />
+                <p className="text-center mt-2 text-lg font-semibold">Your Pet</p>
+              </div>
+
+              {!isMatching && !matchedProfile && (
+                <Button
+                  onClick={startMatching}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"
                 >
-                  <HeartIcon className="w-8 h-8 text-white" />
-                </motion.div>
-                <motion.div
-                  className="absolute -bottom-4 -right-4 bg-purple-400 rounded-full p-3"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <PawPrintIcon className="w-8 h-8 text-white" />
-                </motion.div>
-              </motion.div>
-
-              <AnimatePresence>
-                {isMatchmaking && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.5 }}
-                    className="ml-8" // Add some margin to separate from the pet image
-                  >
-                    <Dial isSpinning={isMatchmaking} onStop={handleMatchmakingStop} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <AnimatePresence>
-              {matchedPet && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="mt-8"
-                >
-                  <MatchResult pet={matchedPet} />
-                </motion.div>
+                  Start Matching
+                </Button>
               )}
-            </AnimatePresence>
 
-            <motion.div variants={itemVariants} className="mt-8">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-lg px-8 py-3 rounded-full hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-lg"
-                onClick={handleMatchmaking}
-                disabled={isMatchmaking}
+              {(isMatching || matchedProfile) && (
+                <div className="relative w-64 h-64">
+                  <AnimatePresence>
+                    {isMatching && (
+                      <motion.div
+                        className="absolute inset-0"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                      >
+                        {userProfiles.map((profile, index) => (
+                          <motion.div
+                            key={index}
+                            className="absolute"
+                            style={{
+                              width: '64px',
+                              height: '64px',
+                              top: '50%',
+                              left: '50%',
+                              marginLeft: '-32px',
+                              marginTop: '-32px',
+                              transformOrigin: '32px 96px',
+                              transform: `rotate(${index * 45}deg)`,
+                            }}
+                          >
+                            <Image
+                              src={profile}
+                              alt={`Profile ${index + 1}`}
+                              width={64}
+                              height={64}
+                              className="rounded-full"
+                            />
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  {matchedProfile && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <Image
+                        src={matchedProfile}
+                        alt="Matched profile"
+                        width={200}
+                        height={200}
+                        className="rounded-full border-4 border-pink-500"
+                      />
+                    </motion.div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {matchedProfile && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-center"
               >
-                <motion.span
-                  className="inline-block"
-                  animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }}
-                  transition={{
-                    duration: 0.6,
-                    ease: "easeInOut",
-                    times: [0, 0.1, 0.3, 0.5, 0.7, 0.9, 1],
-                    loop: Infinity,
-                    repeatDelay: 2
+                <h2 className="text-2xl font-bold text-purple-800 mb-4">It's a Match!</h2>
+                <div className="flex items-center justify-center mb-4">
+                  <HeartIcon className="text-pink-500 w-8 h-8 mr-2" />
+                  <span className="text-3xl font-bold text-pink-500">{matchPercentage}% Match</span>
+                </div>
+                <p className="text-lg text-gray-600">You and your new furry friend seem to be a great match! Why not arrange a playdate?</p>
+                <Button
+                  onClick={() => {
+                    setMatchedProfile(null)
+                    setMatchPercentage(null)
                   }}
+                  className="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"
                 >
-                  🐾
-                </motion.span>
-                {isMatchmaking ? 'Matchmaking...' : 'Start Matchmaking'}
-              </Button>
-            </motion.div>
-
-            <motion.div
-              className="mt-8 space-y-2"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {['Find playdates', 'Make new friends', 'Discover pet-friendly spots'].map((feature, index) => (
-                <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  className="flex items-center justify-center space-x-2"
-                >
-                  <PawPrintIcon className="w-5 h-5 text-purple-500" />
-                  <span className="text-purple-700">{feature}</span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
+                  Find Another Match
+                </Button>
+              </motion.div>
+            )}
+          </div>
         </div>
       </div>
     </SidebarProvider>

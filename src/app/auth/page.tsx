@@ -43,7 +43,7 @@ const features = [
 export default function AuthPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  // const [isLogin, setIsLogin] = useState(true);
   const [formState, setFormState] = useState("initial");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,6 +57,8 @@ export default function AuthPage() {
   const [birdType, setBirdType] = useState("");
   const [error, setError] = useState("");
   const [currentFeature, setCurrentFeature] = useState(0);
+  const [isLogin, setIsLogin] = useState(true);
+  const [fileUrl, setFileUrl] = useState(""); // New state for file URL
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -81,38 +83,32 @@ export default function AuthPage() {
         // Handle login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         if (userCredential.user) {
-          router.push("/dashboard"); // Redirect to dashboard after successful login
+          router.push("/dashboard");
         }
       } else {
         // Handle signup
-        // First validate passwords match
         if (password !== confirmPassword) {
           setError("Passwords do not match");
           setIsLoading(false);
           return;
         }
 
+        // Wait for file to upload if file URL is not set yet
+        if (!fileUrl) {
+          setError("Please upload a file before proceeding");
+          setIsLoading(false);
+          return;
+        }
+
         // Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        
-        // Prepare pet data based on pet type
-        let petData = {
-          name: petName,
-          type: pet,
-          age,
-        };
 
+        // Prepare pet data
+        let petData = { name: petName, type: pet, age, fileUrl }; // Add fileUrl to pet data
         if (pet === "dog" || pet === "cat") {
-          petData = {
-            ...petData,
-            breed,
-            color,
-          };
+          petData = { ...petData, breed, color };
         } else if (pet === "bird") {
-          petData = {
-            ...petData,
-            birdType,
-          };
+          petData = { ...petData, birdType };
         }
 
         // Save user data to Firestore
@@ -124,7 +120,7 @@ export default function AuthPage() {
           createdAt: new Date().toISOString(),
         });
 
-        router.push("/dashboard"); // Redirect to dashboard after successful signup
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Authentication error:", error);
@@ -271,7 +267,7 @@ export default function AuthPage() {
                 onChange={(e) => setColor(e.target.value)}
               />
             </div>
-            <FileUpload />
+            <FileUpload onFileUploadComplete={setFileUrl} />
             <Button
               onClick={handleBack}
               className="mt-4 bg-gray-300 hover:bg-gray-400 block mx-auto"
