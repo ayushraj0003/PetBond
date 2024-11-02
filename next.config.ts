@@ -4,4 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
+module.exports = {
+  images: {
+    domains: ['firebasestorage.googleapis.com'],
+  },
+}
+
 export default nextConfig;

@@ -1,26 +1,56 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import Image from 'next/image'
 import { HeartIcon } from 'lucide-react'
-
 import { DesktopSidebar, MobileSidebar, SidebarLink, SidebarProvider } from "@/components/ui/sidebar"
-
-const userProfiles = [
-  '/Images/dog1.jpeg',
-  '/Images/dog2.jpeg',
-  '/Images/dog3.jpeg',
-  '/Images/dog4.jpeg',
-  '/Images/dog5.jpeg',
-]
+import { db } from "@/firebaseConfig"
+import { collection, getDocs, query, where } from "firebase/firestore"
+import { jwtDecode } from "jwt-decode"
 
 export default function MatchmakingPage() {
   const [isMatching, setIsMatching] = useState(false)
   const [matchedProfile, setMatchedProfile] = useState(null)
   const [matchPercentage, setMatchPercentage] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [userProfiles, setUserProfiles] = useState([])
+  const [currentUserProfile, setCurrentUserProfile] = useState(null)
+
+  // Fetch user data when the component mounts
+  useEffect(() => {
+    const fetchUserProfiles = async () => {
+      const querySnapshot = await getDocs(collection(db, "users"))
+      const profiles = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      setUserProfiles(profiles)
+    }
+    
+    const fetchCurrentUserProfile = async () => {
+      const token = localStorage.getItem("userToken")
+      if (token) {
+        const decodedData = jwtDecode(token)
+        const userEmail = decodedData.email
+        console.log("Decoded email:", userEmail)
+
+        // Query Firestore to get the current user's profile based on email
+        const userQuery = query(collection(db, "users"), where("email", "==", userEmail))
+        const querySnapshot = await getDocs(userQuery)
+        
+        if (!querySnapshot.empty) {
+          setCurrentUserProfile(querySnapshot.docs[0].data())
+        } else {
+          console.error("User profile not found in Firestore")
+        }
+      }
+    }
+
+    fetchUserProfiles()
+    fetchCurrentUserProfile()
+  }, [])
 
   const startMatching = () => {
     setIsMatching(true)
@@ -40,7 +70,7 @@ export default function MatchmakingPage() {
         {/* Sidebar */}
         <DesktopSidebar className="hidden lg:flex flex-col w-64 h-full fixed left-0 top-0 bg-white shadow-lg z-10" open={sidebarOpen} setOpen={setSidebarOpen}>
           <SidebarLink link={{ label: "Home", href: "/", icon: <HeartIcon /> }} />
-          <SidebarLink link={{ label: "Profile", href: "/profile", icon: <HeartIcon /> }} />
+          <SidebarLink link={{ label: "Posting", href: "/posting", icon: <HeartIcon/> }} />
           <SidebarLink link={{ label: "Settings", href: "/settings", icon: <HeartIcon /> }} />
         </DesktopSidebar>
 
@@ -57,14 +87,17 @@ export default function MatchmakingPage() {
           <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-4xl">
             <div className="flex flex-col md:flex-row items-center justify-between mb-8">
               <div className="mb-4 md:mb-0">
-                <Image
-                  src='/Images/dog1.jpeg'
-                  alt="Your profile"
-                  width={200}
-                  height={200}
-                  className="rounded-full border-4 border-purple-500"
-                />
-                <p className="text-center mt-2 text-lg font-semibold">Your Pet</p>
+                {currentUserProfile && currentUserProfile.pet?.fileUrl ? (
+                  <Image
+                    src={currentUserProfile.pet.fileUrl} // Use current user's pet image
+                    alt="Your profile"
+                    width={200}
+                    height={200}
+                    className="rounded-full border-4 border-purple-500"
+                  />
+                ) : (
+                  <p className="text-center mt-2 text-lg font-semibold">Your Pet</p>
+                )}
               </div>
 
               {!isMatching && !matchedProfile && (
@@ -87,7 +120,7 @@ export default function MatchmakingPage() {
                       >
                         {userProfiles.map((profile, index) => (
                           <motion.div
-                            key={index}
+                            key={profile.id}
                             className="absolute"
                             style={{
                               width: '64px',
@@ -101,8 +134,8 @@ export default function MatchmakingPage() {
                             }}
                           >
                             <Image
-                              src={profile}
-                              alt={`Profile ${index + 1}`}
+                              src={profile.pet.fileUrl}
+                              alt={profile.pet.name}
                               width={64}
                               height={64}
                               className="rounded-full"
@@ -120,12 +153,16 @@ export default function MatchmakingPage() {
                       className="absolute inset-0 flex items-center justify-center"
                     >
                       <Image
-                        src={matchedProfile}
-                        alt="Matched profile"
+                        src={matchedProfile.pet.fileUrl}
+                        alt={matchedProfile.pet.name}
                         width={200}
                         height={200}
                         className="rounded-full border-4 border-pink-500"
                       />
+                      <div className="text-center mt-4">
+                        <p className="text-lg font-bold">{matchedProfile.pet.name}</p>
+                        <p className="text-md text-gray-700">{matchedProfile.pet.breed}, Age: {matchedProfile.pet.age}</p>
+                      </div>
                     </motion.div>
                   )}
                 </div>

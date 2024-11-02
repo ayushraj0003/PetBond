@@ -84,6 +84,10 @@ export default function AuthPage() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         if (userCredential.user) {
           router.push("/dashboard");
+          const user = userCredential.user;
+          const token = await user.getIdToken();
+          localStorage.setItem("userToken", token);
+          // console.log(userCredential.user.email);
         }
       } else {
         // Handle signup
