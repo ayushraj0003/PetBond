@@ -13,7 +13,8 @@ export const FloatingNav = ({
   navItems = [], // Default to an empty array
   className,
 }: {
-  navItems?: { // Make navItems optional
+  navItems?: {
+    // Make navItems optional
     name: string;
     link: string;
     icon?: JSX.Element;
@@ -53,26 +54,39 @@ export const FloatingNav = ({
           className
         )}
       >
-        {Array.isArray(navItems) && navItems.map((navItem, idx) => ( // Check if navItems is an array
-          <Link
-            key={`link=${idx}`}
-            href={navItem.link}
-            className={cn(
-              "relative dark:text-neutral-50 items-center flex space-x-1 text-neutral-600 dark:hover:text-neutral-300 hover:text-neutral-500"
-            )}
-          >
-            <span className="block sm:hidden">{navItem.icon}</span>
-            <span className="hidden sm:block text-sm">{navItem.name}</span>
-          </Link>
-        ))}
-        <button className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full">
+        {Array.isArray(navItems) &&
+          navItems.map(
+            (
+              navItem,
+              idx // Check if navItems is an array
+            ) => (
+              <Link
+                key={`link=${idx}`}
+                href={navItem.link}
+                className={cn(
+                  "relative dark:text-neutral-50 items-center flex space-x-1 text-neutral-600 dark:hover:text-neutral-300 hover:text-neutral-500"
+                )}
+              >
+                <span className="block sm:hidden">{navItem.icon}</span>
+                <span className="hidden sm:block text-sm">{navItem.name}</span>
+              </Link>
+            )
+          )}
+        <a
+          href="/auth"
+          className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full"
+        >
           <span>signup</span>
           <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent h-px" />
-        </button>
-        <button className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full">
+        </a>
+
+        <a
+          href="/auth"
+          className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full"
+        >
           <span>Login</span>
           <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent h-px" />
-        </button>
+        </a>
       </motion.div>
     </AnimatePresence>
   );

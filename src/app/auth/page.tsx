@@ -125,6 +125,9 @@ export default function AuthPage() {
         });
 
         router.push("/dashboard");
+        const user = userCredential.user;
+        const token = await user.getIdToken();
+        localStorage.setItem("userToken", token);
       }
     } catch (error) {
       console.error("Authentication error:", error);
@@ -329,7 +332,7 @@ export default function AuthPage() {
                 onChange={(e) => setColor(e.target.value)}
               />
             </div>
-            <FileUpload />
+            <FileUpload onFileUploadComplete={setFileUrl} />
             <Button
               onClick={handleBack}
               className="mt-4 bg-gray-300 hover:bg-gray-400"

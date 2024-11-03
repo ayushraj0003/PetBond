@@ -5,7 +5,7 @@ import { motion, useAnimation } from 'framer-motion'
 import { HeartIcon, ChatBubbleBottomCenterTextIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
 import { FloatingNav } from '@/components/ui/floating-navbar'
-
+import { CardContainer, CardBody, CardItem } from '@/components/ui/3d-card' 
 export default function PetBondLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const controls = useAnimation()
@@ -41,9 +41,9 @@ export default function PetBondLanding() {
             </button>
           </div>
           <ul className={`md:flex space-x-6 ${isMenuOpen ? 'block' : 'hidden'}`}>
+            <li><a href="/auth" className="text-purple-600 hover:text-purple-800">SignUp</a></li>
+            <li><a href="/auth" className="text-purple-600 hover:text-purple-800">Login</a></li>
             <li><a href="#features" className="text-purple-600 hover:text-purple-800">Features</a></li>
-            <li><a href="#how-it-works" className="text-purple-600 hover:text-purple-800">How It Works</a></li>
-            <li><a href="#download" className="text-purple-600 hover:text-purple-800">Download</a></li>
           </ul>
         </nav>
       </header>
@@ -81,27 +81,52 @@ export default function PetBondLanding() {
         </section>
 
         <section id="features" className="container mx-auto px-4 py-20">
-          <h2 className="text-4xl font-bold text-purple-800 text-center mb-12">Why Choose PetBond?</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: HeartIcon, title: "Match with Compatible Pets", description: "Our algorithm finds the perfect playmates for your furry friend" },
-              { icon: ChatBubbleBottomCenterTextIcon, title: "Chat and Plan Meetups", description: "Easily communicate with other pet owners and arrange playdates" },
-              { icon: MapPinIcon, title: "Discover Pet-Friendly Locations", description: "Find the best parks, cafes, and events for you and your pet" }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={controls}
-                custom={index}
-                className="bg-white p-6 rounded-lg shadow-lg text-center"
-              >
-                <feature.icon className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-purple-800 mb-2">{feature.title}</h3>
-                <p className="text-purple-600">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+  <h2 className="text-6xl font-bold text-purple-800 text-center mb-12">Why Choose PetBond?</h2>
+  <div className="grid md:grid-cols-3 gap-8">
+    {[
+      {
+        icon: HeartIcon,
+        title: "Match with Compatible Pets",
+        description: "Our algorithm finds the perfect playmates for your furry friend",
+      },
+      {
+        icon: ChatBubbleBottomCenterTextIcon,
+        title: "Chat and Plan Meetups",
+        description: "Easily communicate with other pet owners and arrange playdates",
+      },
+      {
+        icon: MapPinIcon,
+        title: "Make Friends for Your Pets",
+        description: "Find friends for your pets, arrange playdates, and share tips for a happier, healthier life.",
+      },
+    ].map((feature, index) => (
+      <CardContainer
+        key={index}
+        className="relative hover:shadow-lg transform hover:scale-105 transition-transform duration-300"
+        containerClassName="perspective-1000"
+      >
+        <CardBody className="bg-white p-6 rounded-lg shadow-lg text-center">
+          <CardItem
+            as="div"
+            translateX="0px"
+            translateY="0px"
+            translateZ="20px"
+            rotateX="10deg"
+            rotateY="10deg"
+            rotateZ="0deg"
+            className="flex flex-col items-center"
+          >
+            <feature.icon className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+            <h3 className="text-3xl font-semibold text-purple-800 mb-2">{feature.title}</h3>
+            <p className="text-xl text-purple-600">{feature.description}</p>
+          </CardItem>
+        </CardBody>
+      </CardContainer>
+    ))}
+  </div>
+</section>
+
+
 
         <section id="how-it-works" className="container mx-auto px-4 py-20 text-center">
           <h2 className="text-4xl font-bold text-purple-800 mb-12">How It Works</h2>
