@@ -16,25 +16,25 @@ import { useRouter } from "next/navigation";
 const features = [
   {
     title: "Find Playdates",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/Images/photo3.jpg",
     description:
       "Connect with other pet owners and arrange fun playdates for your furry friends.",
   },
   {
     title: "Discover Pet-Friendly Spots",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/Images/photo4.jpg",
     description:
       "Explore the best parks, cafes, and events that welcome pets in your area.",
   },
   {
     title: "Share Pet Stories",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/Images/photo1.jpg",
     description:
       "Create a profile for your pet and share their adorable moments with the community.",
   },
   {
     title: "Expert Advice",
-    image: "/placeholder.svg?height=400&width=600",
+    image: "/Images/photo5.jpg",
     description:
       "Access tips and advice from pet care professionals to keep your furry friend happy and healthy.",
   },

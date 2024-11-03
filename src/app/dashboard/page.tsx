@@ -1,5 +1,5 @@
 'use client'
-
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
@@ -95,6 +95,8 @@ const MatchAnimation = ({ profiles }) => (
 
 export default function MatchmakingPage() {
   // State management
+  const router = useRouter();
+
   const [isMatching, setIsMatching] = useState(false)
   const [matchedProfile, setMatchedProfile] = useState(null)
   const [matchPercentage, setMatchPercentage] = useState(null)
@@ -243,7 +245,13 @@ export default function MatchmakingPage() {
       setIsMatching(false);
     }
   };
+  const handleLogout = () => {
+    // Clear user authentication state
+    localStorage.removeItem("userToken"); // Example: Remove the token from local storage
 
+    // Redirect to the login page or home page after logout
+    router.push("/auth");
+  };
   // Handle skipping current match
   const handleSkipMatch = () => {
     setRequestStatus("")
@@ -328,15 +336,22 @@ export default function MatchmakingPage() {
     <SidebarProvider open={sidebarOpen} setOpen={setSidebarOpen}>
       <div className="flex min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-purple-200">
         
-        <DesktopSidebar className="hidden lg:flex flex-col w-64 h-full fixed left-0 top-0 bg-white/90 backdrop-blur-sm shadow-lg z-10" open={sidebarOpen} setOpen={setSidebarOpen}>
-          <SidebarLink link={{ label: "Home", href: "/", icon: <Home className="text-purple-600" /> }} />
-          <SidebarLink link={{ label: "Match", href: "/posting", icon: <PawPrint className="text-purple-600" /> }} />
-          <SidebarLink link={{ label: "Friends", href: "/friends", icon: <MessageCircle className="text-purple-600" /> }} />
-        </DesktopSidebar>
+      <DesktopSidebar className="hidden lg:flex flex-col w-64 h-full fixed left-0 top-0 bg-white/90 backdrop-blur-sm shadow-lg z-10" open={sidebarOpen} setOpen={setSidebarOpen}>
+      <SidebarLink link={{ label: "Home", href: "/", icon: <Home className="text-purple-600" /> }} />
+      <SidebarLink link={{ label: "Posts", href: "/posting", icon: <PawPrint className="text-purple-600" /> }} />
+      <SidebarLink link={{ label: "Friends", href: "/friends", icon: <MessageCircle className="text-purple-600" /> }}/> 
+      {/* <div
+        onClick={handleLogout}
+        className="cursor-pointer flex items-center space-x-2 text-purple-600 hover:text-purple-800"
+      >
+        <MessageCircle className="text-purple-600" />
+        <span>LogOut</span>
+      </div> */}
+    </DesktopSidebar>
 
         <MobileSidebar className="lg:hidden w-64" open={sidebarOpen} setOpen={setSidebarOpen}>
           <SidebarLink link={{ label: "Home", href: "/", icon: <Home className="text-purple-600" /> }} />
-          <SidebarLink link={{ label: "Match", href: "/posting", icon: <PawPrint className="text-purple-600" /> }} />
+          <SidebarLink link={{ label: "Posts", href: "/posting", icon: <PawPrint className="text-purple-600" /> }} />
           <SidebarLink link={{ label: "Friends", href: "/friends", icon: <MessageCircle className="text-purple-600" /> }} />
         </MobileSidebar>
 

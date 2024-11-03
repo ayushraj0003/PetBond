@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, useAnimation } from 'framer-motion'
 import { HeartIcon, ChatBubbleBottomCenterTextIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import Image from 'next/image'
 import { FloatingNav } from '@/components/ui/floating-navbar'
 import { CardContainer, CardBody, CardItem } from '@/components/ui/3d-card' 
 export default function PetBondLanding() {
+  const router =useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const controls = useAnimation()
 
@@ -17,7 +19,14 @@ export default function PetBondLanding() {
       transition: { delay: i * 0.1 }
     }))
   }, [controls])
-
+const handleDash =()=>{
+  const token = localStorage.getItem("userToken")
+  if(token){
+    router.push("/dashboard")
+  }else{
+    router.push("/auth")
+  }
+}
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-100 to-purple-200">
       <header className="container mx-auto px-4 py-6">
@@ -71,12 +80,13 @@ export default function PetBondLanding() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <a
-              href="#download"
+            <button
+              onClick={handleDash}
+              
               className="bg-purple-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-purple-700 transition duration-300"
             >
               Get Started
-            </a>
+            </button>
           </motion.div>
         </section>
 
