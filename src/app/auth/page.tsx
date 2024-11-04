@@ -12,6 +12,7 @@ import { auth, db } from "@/firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { FirebaseError } from 'firebase/app';
 
 // Define TypeScript interfaces
 interface Feature {
@@ -141,7 +142,7 @@ export default function AuthPage() {
         localStorage.setItem("userToken", token);
         router.push("/dashboard");
       }
-    } catch (error: any) {
+    }catch (error: FirebaseError) {
       console.error("Authentication error:", error);
       setError(error.message || "An error occurred");
     } finally {
