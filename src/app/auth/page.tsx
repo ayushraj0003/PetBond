@@ -246,7 +246,7 @@ export default function AuthPage() {
                 onChange={(e) => setBreed(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm"
               >
-                <option>Select your dog's breed</option>
+                <option>Select your dog&#39;s breed</option>
                 {dogBreeds.map((dogBreed) => (
                   <option key={dogBreed} value={dogBreed}>
                     {dogBreed}
@@ -304,7 +304,7 @@ export default function AuthPage() {
                 onChange={(e) => setBreed(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm"
               >
-                <option >Select your cat's breed</option>
+                <option >Select your cat&#39;s breed</option>
                 {catBreeds.map((catBreed) => (
                   <option key={catBreed} value={catBreed}>
                     {catBreed}
