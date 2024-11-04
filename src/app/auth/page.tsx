@@ -8,12 +8,29 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import { FileUpload } from "@/components/ui/file-upload";
-import { auth, db} from "@/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
-const features = [
+// Define TypeScript interfaces
+interface Feature {
+  title: string;
+  image: string;
+  description: string;
+}
+
+interface PetData {
+  name: string;
+  type: string;
+  age: string;
+  fileUrl: string;
+  breed?: string;
+  color?: string;
+  birdType?: string;
+}
+
+const features: Feature[] = [
   {
     title: "Find Playdates",
     image: "/Images/photo3.jpg",
@@ -43,7 +60,6 @@ const features = [
 export default function AuthPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  // const [isLogin, setIsLogin] = useState(true);
   const [formState, setFormState] = useState("initial");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -58,7 +74,7 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isLogin, setIsLogin] = useState(true);
-  const [fileUrl, setFileUrl] = useState(""); // New state for file URL
+  const [fileUrl, setFileUrl] = useState("");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -67,12 +83,12 @@ export default function AuthPage() {
     return () => clearInterval(timer);
   }, []);
 
-  const handlePetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedPet = e.target.value;
     setPet(selectedPet);
     setFormState(selectedPet);
   };
-  
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -80,42 +96,39 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        // Handle login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         if (userCredential.user) {
-          router.push("/dashboard");
-          const user = userCredential.user;
-          const token = await user.getIdToken();
+          const token = await userCredential.user.getIdToken();
           localStorage.setItem("userToken", token);
-          // console.log(userCredential.user.email);
+          router.push("/dashboard");
         }
       } else {
-        // Handle signup
         if (password !== confirmPassword) {
           setError("Passwords do not match");
-          setIsLoading(false);
           return;
         }
 
-        // Wait for file to upload if file URL is not set yet
-        if (!fileUrl) {
+        if (!fileUrl && formState !== "initial") {
           setError("Please upload a file before proceeding");
-          setIsLoading(false);
           return;
         }
 
-        // Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-        // Prepare pet data
-        let petData = { name: petName, type: pet, age, fileUrl }; // Add fileUrl to pet data
+        const petData: PetData = {
+          name: petName,
+          type: pet,
+          age,
+          fileUrl
+        };
+
         if (pet === "dog" || pet === "cat") {
-          petData = { ...petData, breed, color };
+          petData.breed = breed;
+          petData.color = color;
         } else if (pet === "bird") {
-          petData = { ...petData, birdType };
+          petData.birdType = birdType;
         }
 
-        // Save user data to Firestore
         await addDoc(collection(db, "users"), {
           uid: userCredential.user.uid,
           name,
@@ -124,42 +137,23 @@ export default function AuthPage() {
           createdAt: new Date().toISOString(),
         });
 
-        router.push("/dashboard");
-        const user = userCredential.user;
-        const token = await user.getIdToken();
+        const token = await userCredential.user.getIdToken();
         localStorage.setItem("userToken", token);
+        router.push("/dashboard");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Authentication error:", error);
-      setError(error.message);
+      setError(error.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // const renderSubmitButton = () => (
-  //   <Button
-  //     type="submit"
-  //     className="w-full bg-purple-600 hover:bg-purple-700"
-  //     disabled={isLoading}
-  //   >
-  //     {isLoading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
-  //   </Button>
-  // );
-
-  const formVariants = {
-    initial: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -50 },
-    enter: { opacity: 1, x: 0 },
-  };
-
-  // Add this function inside your AuthPage component
   const handleBack = () => {
-    setPet(""); // Reset pet selection
-    setFormState("initial"); // Go back to the initial form state
+    setPet("");
+    setFormState("initial");
   };
 
-  // Modify your renderForm function to include the Back button
   const renderForm = () => {
     const dogBreeds = ["Labrador", "German Shepherd", "Bulldog", "Beagle"];
     const catBreeds = ["Persian", "Maine Coon", "Siamese", "Ragdoll"];
@@ -168,7 +162,6 @@ export default function AuthPage() {
       case "initial":
         return (
           <>
-            {/* Full Name, Email, Password, Confirm Password Fields */}
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
@@ -215,7 +208,7 @@ export default function AuthPage() {
                 id="pet"
                 value={pet}
                 onChange={handlePetChange}
-                className="block w-full rounded-md border-gray-300 shadow-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm p-2"
               >
                 <option value="">Select your pet</option>
                 <option value="dog">Dog</option>
@@ -226,64 +219,8 @@ export default function AuthPage() {
           </>
         );
       case "dog":
-        return (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="petName">Pet Name</Label>
-              <Input
-                id="petName"
-                type="text"
-                placeholder="Enter your pet's name"
-                value={petName}
-                onChange={(e) => setPetName(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="breed">Breed</Label>
-              <select
-                id="breed"
-                value={breed}
-                onChange={(e) => setBreed(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm"
-              >
-                <option>Select your dog&#39;s breed</option>
-                {dogBreeds.map((dogBreed) => (
-                  <option key={dogBreed} value={dogBreed}>
-                    {dogBreed}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="age">Age</Label>
-              <Input
-                id="age"
-                type="text"
-                placeholder="Enter your pet's age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="color">Color</Label>
-              <Input
-                id="color"
-                type="text"
-                placeholder="Enter your pet's color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-              />
-            </div>
-            <FileUpload onFileUploadComplete={setFileUrl} />
-            <Button
-              onClick={handleBack}
-              className="mt-4 bg-gray-300 hover:bg-gray-400 block mx-auto"
-            >
-              Go Back
-            </Button>
-          </>
-        );
       case "cat":
+        const breeds = formState === "dog" ? dogBreeds : catBreeds;
         return (
           <>
             <div className="space-y-2">
@@ -302,12 +239,12 @@ export default function AuthPage() {
                 id="breed"
                 value={breed}
                 onChange={(e) => setBreed(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm p-2"
               >
-                <option >Select your cat&#39;s breed</option>
-                {catBreeds.map((catBreed) => (
-                  <option key={catBreed} value={catBreed}>
-                    {catBreed}
+                <option value="">Select your {formState}&apos;s breed</option>
+                {breeds.map((breedOption) => (
+                  <option key={breedOption} value={breedOption}>
+                    {breedOption}
                   </option>
                 ))}
               </select>
@@ -334,8 +271,9 @@ export default function AuthPage() {
             </div>
             <FileUpload onFileUploadComplete={setFileUrl} />
             <Button
+              type="button"
               onClick={handleBack}
-              className="mt-4 bg-gray-300 hover:bg-gray-400"
+              className="mt-4 bg-gray-300 hover:bg-gray-400 w-full"
             >
               Back
             </Button>
@@ -345,12 +283,22 @@ export default function AuthPage() {
         return (
           <>
             <div className="space-y-2">
-              <Label htmlFor="birdType">Select Bird Type</Label>
+              <Label htmlFor="petName">Pet Name</Label>
+              <Input
+                id="petName"
+                type="text"
+                placeholder="Enter your bird's name"
+                value={petName}
+                onChange={(e) => setPetName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="birdType">Bird Type</Label>
               <select
                 id="birdType"
                 value={birdType}
                 onChange={(e) => setBirdType(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm"
+                className="block w-full rounded-md border-gray-300 shadow-sm p-2"
               >
                 <option value="">Select bird type</option>
                 <option value="parrot">Parrot</option>
@@ -367,10 +315,11 @@ export default function AuthPage() {
                 onChange={(e) => setAge(e.target.value)}
               />
             </div>
-            <FileUpload />
+            <FileUpload onFileUploadComplete={setFileUrl} />
             <Button
+              type="button"
               onClick={handleBack}
-              className="mt-4 bg-gray-300 hover:bg-gray-400"
+              className="mt-4 bg-gray-300 hover:bg-gray-400 w-full"
             >
               Back
             </Button>
@@ -381,8 +330,15 @@ export default function AuthPage() {
     }
   };
 
+  const formVariants = {
+    initial: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -50 },
+    enter: { opacity: 1, x: 0 },
+  };
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-b from-pink-100 to-purple-200">
+      {/* Left Section - Form */}
       <div className="w-full md:w-1/2 p-4 md:p-8 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
           <h1 className="text-3xl font-bold text-center text-purple-800 mb-6">
@@ -422,9 +378,9 @@ export default function AuthPage() {
                 {isLogin && (
                   <>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="loginEmail">Email</Label>
                       <Input
-                        id="email"
+                        id="loginEmail"
                         type="email"
                         placeholder="Enter your email"
                         value={email}
@@ -433,9 +389,9 @@ export default function AuthPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="loginPassword">Password</Label>
                       <Input
-                        id="password"
+                        id="loginPassword"
                         type="password"
                         placeholder="Enter your password"
                         value={password}
@@ -448,16 +404,13 @@ export default function AuthPage() {
   
                 <Button
                   type="submit"
-                  className={`w-full relative ${
+                  className={`w-full ${
                     isLoading 
                       ? 'bg-purple-400 cursor-not-allowed' 
                       : 'bg-purple-600 hover:bg-purple-700'
                   }`}
                   disabled={isLoading}
                 >
-                  {/* {isLoading && (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2 inline-block" />
-                  )} */}
                   {isLoading
                     ? "Processing..."
                     : isLogin
@@ -467,10 +420,12 @@ export default function AuthPage() {
               </form>
             </motion.div>
           </AnimatePresence>
+  
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
               <Button
+                type="button"
                 variant="link"
                 className="text-purple-600 hover:text-purple-800"
                 onClick={() => {
@@ -486,6 +441,8 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+  
+      {/* Right Section - Features Showcase */}
       <div className="w-full md:w-1/2 p-4 md:p-8 flex items-center justify-center">
         <div className="w-full max-w-xl">
           <AnimatePresence mode="wait">
@@ -497,16 +454,18 @@ export default function AuthPage() {
               transition={{ duration: 0.5 }}
               className="bg-white rounded-lg shadow-xl overflow-hidden"
             >
-              <Image
-                src={features[currentFeature].image}
-                alt={features[currentFeature].title}
-                layout="responsive"
-                width={600}
-                height={400}
-                className="object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-bold">
+              <div className="relative w-full h-[400px]">
+                <Image
+                  src={features[currentFeature].image}
+                  alt={features[currentFeature].title}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-2">
                   {features[currentFeature].title}
                 </h3>
                 <p className="text-gray-600">
