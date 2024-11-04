@@ -48,7 +48,7 @@ export default function FriendsPage() {
   const [receivedRequests, setReceivedRequests] = useState<FriendRequest[]>([])
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([])
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
-  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null)
+  // const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -64,7 +64,7 @@ export default function FriendsPage() {
 
         const decodedData = jwtDecode(token) as { email: string }
         const userEmail = decodedData.email
-        setCurrentUserEmail(userEmail)
+        // setCurrentUserEmail(userEmail)
 
         // First, get the current user's ID
         const userQuery = query(collection(db, "users"), where("email", "==", userEmail))
@@ -359,7 +359,8 @@ export default function FriendsPage() {
                       <AnimatePresence>
                         {friends.length === 0 ? (
                           <div className="text-center py-8">
-                            <p className="text-gray-500 mb-4">You haven't made any friends yet.</p>
+<p className="text-gray-500 mb-4">You haven&#39;t made any friends yet.</p>
+
                             <Button asChild variant="outline" className="hover:bg-purple-50">
                               <a href="/matchmaking">Start Matching!</a>
                             </Button>

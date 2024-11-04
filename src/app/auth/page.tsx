@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import { FileUpload } from "@/components/ui/file-upload";
-import { auth, db , storage} from "@/firebaseConfig";
+import { auth, db} from "@/firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 const features = [
@@ -137,15 +137,15 @@ export default function AuthPage() {
     }
   };
 
-  const renderSubmitButton = () => (
-    <Button
-      type="submit"
-      className="w-full bg-purple-600 hover:bg-purple-700"
-      disabled={isLoading}
-    >
-      {isLoading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
-    </Button>
-  );
+  // const renderSubmitButton = () => (
+  //   <Button
+  //     type="submit"
+  //     className="w-full bg-purple-600 hover:bg-purple-700"
+  //     disabled={isLoading}
+  //   >
+  //     {isLoading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
+  //   </Button>
+  // );
 
   const formVariants = {
     initial: { opacity: 1, x: 0 },
@@ -246,7 +246,7 @@ export default function AuthPage() {
                 onChange={(e) => setBreed(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm"
               >
-                <option value="">Select your dog's breed</option>
+                <option>Select your dog's breed</option>
                 {dogBreeds.map((dogBreed) => (
                   <option key={dogBreed} value={dogBreed}>
                     {dogBreed}
@@ -304,7 +304,7 @@ export default function AuthPage() {
                 onChange={(e) => setBreed(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm"
               >
-                <option value="">Select your cat's breed</option>
+                <option >Select your cat's breed</option>
                 {catBreeds.map((catBreed) => (
                   <option key={catBreed} value={catBreed}>
                     {catBreed}

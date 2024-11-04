@@ -24,13 +24,6 @@ export function FileUpload({ onFileUploadComplete }) {
 
     uploadTask.on(
       "state_changed",
-      (snapshot) => {
-        // Progress monitoring, if desired
-      },
-      (error) => {
-        setError("Upload failed. Try again.");
-        setUploading(false);
-      },
       async () => {
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
         setUploading(false);

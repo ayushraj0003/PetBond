@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from 'next/image'
@@ -340,13 +340,13 @@ export default function MatchmakingPage() {
       <SidebarLink link={{ label: "Home", href: "/", icon: <Home className="text-purple-600" /> }} />
       <SidebarLink link={{ label: "Posts", href: "/posting", icon: <PawPrint className="text-purple-600" /> }} />
       <SidebarLink link={{ label: "Friends", href: "/friends", icon: <MessageCircle className="text-purple-600" /> }}/> 
-      {/* <div
+     <div
         onClick={handleLogout}
         className="cursor-pointer flex items-center space-x-2 text-purple-600 hover:text-purple-800"
       >
         <MessageCircle className="text-purple-600" />
         <span>LogOut</span>
-      </div> */}
+      </div> 
     </DesktopSidebar>
 
         <MobileSidebar className="lg:hidden w-64" open={sidebarOpen} setOpen={setSidebarOpen}>

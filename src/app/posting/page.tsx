@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Send, ThumbsUp, MessageCircle } from "lucide-react";
-import { db, auth, storage } from "@/firebaseConfig";
+import { db,storage } from "@/firebaseConfig";
 import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { jwtDecode } from "jwt-decode"; // Import jwtDecode without braces
@@ -42,21 +42,42 @@ export default function PetShowcase() {
       setPosts(loadedPosts);
     };
 
+    interface DecodedToken {
+      email: string;
+      // Add other fields from the token payload if needed
+    }
+    
+    // Define the structure of your Firestore user data
+    interface UserProfile {
+      name: string;
+      // Add other fields as needed
+    }
+    
     const fetchCurrentUserProfile = async () => {
       const token = localStorage.getItem("userToken");
+    
       if (token) {
-        const decodedData: any = jwtDecode(token);
-        const userEmail = decodedData.email;
-
-        // Query Firestore to get the current user's profile based on email
-        const userQuery = query(collection(db, "users"), where("email", "==", userEmail));
-        const querySnapshot = await getDocs(userQuery);
-
-        if (!querySnapshot.empty) {
-          setCurrentUserProfile(querySnapshot.docs[0].data() as { name: string });
-        } else {
-          console.error("User profile not found in Firestore");
+        try {
+          // Decode the token using the DecodedToken interface
+          const decodedData: DecodedToken = jwtDecode<DecodedToken>(token);
+          const userEmail = decodedData.email;
+    
+          // Query Firestore to get the current user's profile based on email
+          const userQuery = query(collection(db, "users"), where("email", "==", userEmail));
+          const querySnapshot = await getDocs(userQuery);
+    
+          if (!querySnapshot.empty) {
+            // Cast the document data to the UserProfile interface
+            const userProfile = querySnapshot.docs[0].data() as UserProfile;
+            setCurrentUserProfile(userProfile);
+          } else {
+            console.error("User profile not found in Firestore");
+          }
+        } catch (error) {
+          console.error("Error decoding token or fetching user profile:", error);
         }
+      } else {
+        console.error("No token found in localStorage");
       }
     };
 
@@ -85,15 +106,24 @@ export default function PetShowcase() {
     );
 
     // Prepare post data with logged-in user name as author and current timestamp
+    interface Post {
+      id: string;
+      author: string;
+      content: string;
+      images: string[];
+      likes: number;
+      comments: number;
+      timestamp: Timestamp; // Ensure timestamp is of type Timestamp
+    }
+    
     const post: Omit<Post, "id"> = {
       author: currentUserProfile.name,
       content: newPost,
       images: uploadedImageUrls,
       likes: 0,
       comments: 0,
-      timestamp: serverTimestamp() // Use Firestore server timestamp
+      timestamp: serverTimestamp() as Timestamp // Cast to Timestamp for type compatibility
     };
-
     try {
       const docRef = await addDoc(collection(db, "posts"), post);
       setPosts([{ id: docRef.id, ...post }, ...posts]); // Add the new post to state
@@ -111,11 +141,11 @@ export default function PetShowcase() {
     }
   };
 
-  const formatTimestamp = (timestamp: any) => {
+  const formatTimestamp = (timestamp: Timestamp | Date | number) => {
     if (timestamp instanceof Timestamp) {
       return timestamp.toDate().toLocaleString(); // Correctly formats Firestore Timestamp
     }
-    return new Date(timestamp).toLocaleString(); // Fallback
+    return new Date(timestamp).toLocaleString(); // Fallback for Date or number
   };
 
   return (
@@ -124,7 +154,7 @@ export default function PetShowcase() {
 
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Share Your Pet's Achievement</CardTitle>
+          <CardTitle>Share Your Pet&#39;s Achievement</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handlePostSubmit} className="space-y-4">

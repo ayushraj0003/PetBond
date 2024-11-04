@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useAnimation } from 'framer-motion'
 import { HeartIcon, ChatBubbleBottomCenterTextIcon, MapPinIcon } from '@heroicons/react/24/outline'
-import Image from 'next/image'
 import { FloatingNav } from '@/components/ui/floating-navbar'
 import { CardContainer, CardBody, CardItem } from '@/components/ui/3d-card' 
 export default function PetBondLanding() {
@@ -65,7 +64,7 @@ const handleDash =()=>{
             transition={{ duration: 0.5 }}
             className="text-5xl md:text-6xl font-bold text-purple-800 mb-6"
           >
-            Find Your Pet's Perfect Match
+            Find Your Pet&#39;s Perfect Match
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: -20 }}
@@ -164,7 +163,7 @@ const handleDash =()=>{
         </section>
 
         <section id="download" className="container mx-auto px-4 py-20 text-center">
-          <h2 className="text-4xl font-bold text-purple-800 mb-6">Ready to Find Your Pet's Soulmate?</h2>
+          <h2 className="text-4xl font-bold text-purple-800 mb-6">Ready to Find Your Pet&#39;s Soulmate?</h2>
           <p className="text-xl text-purple-600 mb-10">Download PetBond now and start making connections!</p>
           <div className="flex justify-center space-x-4">
             <motion.a
