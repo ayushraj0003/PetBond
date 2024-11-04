@@ -67,13 +67,13 @@ export default function AuthPage() {
     return () => clearInterval(timer);
   }, []);
 
-  const handlePetChange = (e) => {
+  const handlePetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedPet = e.target.value;
     setPet(selectedPet);
     setFormState(selectedPet);
   };
-
-  const handleSubmit = async (e) => {
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
